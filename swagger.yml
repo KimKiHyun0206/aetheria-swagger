@@ -1,0 +1,353 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+paths:
+  /api/v1/running-art/{path}:
+    get:
+      tags:
+        - Image Fetch
+      summary: 경로 변수를 사용하여 달리기 기록 아트 이미지 가져오기
+      description: 이미지 파일 시스템 경로를 기반으로 이미지를 Resource 형태로 스트리밍합니다. Cache-Control 헤더가
+        설정됩니다.
+      operationId: fetchRunnerArtImage
+      parameters:
+        - name: path
+          in: path
+          description: 이미지 파일명 또는 저장 경로(확장자 포함)
+          required: true
+          example: sample_image.png
+      responses:
+        "200":
+          description: "이미지 리소스가 성공적으로 반환됨. Content-Type: image/jpeg"
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: 해당 경로의 이미지를 찾을 수 없음
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/ServerResponse"
+  /api/v1/image:
+    get:
+      tags:
+        - Image Metadata
+      summary: 인증된 사용자의 모든 이미지 메타데이터를 SSE로 스트리밍 조회합니다.
+      description: "인증된 사용자만 접근 가능하며, 데이터는 Server-Sent Events(text/event-stream) 형\
+        식으로 스트리밍됩니다."
+      operationId: findImagesByRunnerId
+      responses:
+        "200":
+          description: 이미지 메타데이터 목록이 SSE 형태로 스트리밍됩니다.
+          content:
+            text/event-stream:
+              schema:
+                $ref: "#/components/schemas/ImageMetadataResponse"
+        "401":
+          description: 인증 정보가 유효하지 않습니다.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ServerSentEventDataBuffer"
+    post:
+      tags:
+        - Image Metadata
+      summary: 새로운 이미지 메타데이터를 저장합니다.
+      operationId: saveImage
+      requestBody:
+        description: 저장할 이미지 메타데이터
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: "#/components/schemas/ImageMetadataSaveRequest"
+        required: true
+      responses:
+        "200":
+          description: 성공적으로 이미지를 저장했습니다.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/ServerResponse"
+  /api/v1/image/{imageId}:
+    get:
+      tags:
+        - Image Metadata
+      summary: ID로 이미지 메타데이터를 조회합니다.
+      description: "인증된 사용자는 자신의 이미지를 조회할 수 있으며, 공유된(Shared) 이미지도 조회할 수 있습니다."
+      operationId: findImageById
+      parameters:
+        - name: imageId
+          in: path
+          description: 조회할 이미지의 고유 ID
+          required: true
+      responses:
+        "200":
+          description: 정상적으로 이미지 메타데이터를 반환합니다.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/ImageMetadataResponse"
+        "404":
+          description: 해당 ID의 이미지를 찾을 수 없습니다.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/ServerResponse"
+    put:
+      tags:
+        - Image Metadata
+      summary: ID로 이미지 메타데이터를 업데이트합니다. (소유자만 가능)
+      operationId: updateImageById
+      parameters:
+        - name: imageId
+          in: path
+          description: 업데이트할 이미지의 고유 ID
+          required: true
+      requestBody:
+        description: 업데이트할 이미지 메타데이터
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: "#/components/schemas/ImageMetadataUpdateRequest"
+        required: true
+      responses:
+        "200":
+          description: 성공적으로 이미지 메타데이터를 업데이트했습니다.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/ServerResponse"
+    delete:
+      tags:
+        - Image Metadata
+      summary: ID로 이미지 메타데이터를 삭제합니다. (소유자만 가능)
+      operationId: deleteImageById
+      parameters:
+        - name: imageId
+          in: path
+          description: 삭제할 이미지의 고유 ID
+          required: true
+      responses:
+        "200":
+          description: 성공적으로 이미지를 삭제했습니다.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/ServerResponse"
+  /api/v1/auth/authorization/kakao:
+    get:
+      tags:
+        - Auth
+      summary: 카카오 로그인 페이지로 리다이렉트
+      operationId: authRedirectToKakao
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerResponse"
+  /api/v1/auth/sign-in:
+    get:
+      tags:
+        - Auth
+      summary: 로그인 코드로 카카오 액세스 토큰 발급
+      operationId: authSignIn
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerResponse"
+  /api/v1/auth/sign-off:
+    post:
+      tags:
+        - Auth
+      summary: 카카오 계정 연결 끊기 및 서비스 회원 탈퇴
+      operationId: authSignOff
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerResponse"
+  /api/v1/auth/sign-out:
+    post:
+      tags:
+        - Auth
+      summary: JWT 토큰 무효화를 통한 서비스 로그아웃
+      operationId: authSignOut
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerResponse"
+  /api/hello:
+    get:
+      tags:
+        - Hello
+      summary: 간단한 테스트용 Hello 엔드포인트
+      operationId: hello
+      responses:
+        "200":
+          description: 성공적으로 JSON 메시지를 반환합니다.
+          content:
+            application/json:
+              schema:
+                type: string
+        "404":
+          description: 경로를 찾을 수 없습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerResponse"
+  /api/hello/error:
+    get:
+      tags:
+        - Hello
+      summary: 전역 예외 처리를 테스트하기 위한 오류 발생 엔드포인트
+      operationId: helloError
+      responses:
+        "500":
+          description: 의도된 BusinessException 오류 발생
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerResponse"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerResponse"
+  /api/v1/token:
+    post:
+      tags:
+        - Token
+      summary: 토큰 재발급을 위한 메소드
+      operationId: tokenRefresh
+      responses:
+        "500":
+          description: 의도된 BusinessException 오류 발생
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerResponse"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerResponse"
+components:
+  schemas:
+    ServerResponse:
+      type: object
+    ImageMetadataResponse:
+      type: object
+      properties:
+        title:
+          type: string
+          description: 이미지의 현재 제목
+          example: 나의 런닝 아트
+        description:
+          type: string
+          description: 이미지에 대한 상세 설명
+          example: 2025년 10월 15일에 생성된 5km 달리기 경로 이미지입니다.
+        location:
+          type: string
+          description: 이미지가 생성된 위치
+          example: 한신대학교
+        imagePath:
+          type: string
+          description: 클라이언트가 접근 가능한 최종 이미지 URL 또는 경로
+          example: "/api/v1/image/{이미지 아이디}"
+        shape:
+          type: string
+          description: 이미지의 주된 형태 또는 스타일
+          example: SQUARE
+          enum:
+            - CIRCLE
+            - SQUARE
+            - TRIANGLE
+            - HEXAGON
+        proficiency:
+          type: string
+          description: 이미지 생성 시 사용된 사용자의 숙련도 수준
+          example: INTERMEDIATE
+          enum:
+            - BEGINNER
+            - INTERMEDIATE
+            - ADVANCED
+            - EXPERT
+        shared:
+          type: boolean
+          description: 해당 이미지가 다른 사용자에게 공개(공유)되었는지 여부
+          example: true
+        createdAt:
+          type: string
+          description: 메타데이터가 최초로 생성된 날짜 (YYYY-MM-DD)
+          format: date
+          example: 2024-05-15
+        modifiedAt:
+          type: string
+          description: 메타데이터가 마지막으로 수정된 날짜 (YYYY-MM-DD)
+          format: date
+          example: 2024-05-16
+      description: 이미지 메타데이터 및 접근 경로를 포함하는 최종 응답 DTO
+    ServerSentEventDataBuffer:
+      type: object
+    ImageMetadataSaveRequest:
+      required:
+        - location
+        - proficiency
+        - shape
+      type: object
+      properties:
+        location:
+          type: string
+          description: 런닝 아트가 생성된 위치
+          example: 한신대학교
+        proficiency:
+          type: string
+          description: 이미지 생성에 사용된 사용자의 숙련도 수준
+          example: BEGINNER
+          enum:
+            - BEGINNER
+            - INTERMEDIATE
+            - ADVANCED
+            - EXPERT
+        shape:
+          type: string
+          description: 이미지의 주된 형태 또는 스타일
+          example: SQUARE
+          enum:
+            - CIRCLE
+            - SQUARE
+            - TRIANGLE
+            - HEXAGON
+    ImageMetadataUpdateRequest:
+      required:
+        - title
+      type: object
+      properties:
+        title:
+          type: string
+          description: 이미지의 새로운 제목. 이 값은 필수로 제공되어야 합니다.
+          example: 겨울의 런닝 아트
+        description:
+          type: string
+          description: "이미지에 대한 상세 설명. 비어있을 수 있으며, 제공하지 않을 경우 '설명 없음'으로 처리됩니다."
+          example: 2024년 5월 10일에 달린 5km 코스
