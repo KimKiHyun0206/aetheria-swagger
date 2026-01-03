@@ -18,20 +18,20 @@ tags:
 - name: Running Art
   description: 런닝 아트 관리 API
 paths:
-  "/api/v1/auth/reissue":
+  /api/v1/auth/reissue:
     post:
       tags:
       - Auth
       summary: 토큰 재발급 (Refresh Token Rotation)
-      description: 만료된 Access Token과 유효한 Refresh Token을 사용하여 새로운 토큰 세트(Access/Refresh)를
-        발급받습니다. RTR 정책에 따라 기존 리프레시 토큰은 더 이상 사용할 수 없으며, 새 리프레시 토큰이 쿠키로 설정됩니다.
+      description: "만료된 Access Token과 유효한 Refresh Token을 사용하여 새로운 토큰 세트(Access/Refresh)를\
+        \ 발급받습니다. RTR 정책에 따라 기존 리프레시 토큰은 더 이상 사용할 수 없으며, 새 리프레시 토큰이 쿠키로 설정됩니다."
       operationId: reissue
       responses:
-        '200':
+        "200":
           description: 재발급 성공
           headers:
             Set-Cookie:
-              description: 새로 발급된 리프레시 토큰 쿠키 (HttpOnly, Secure)
+              description: "새로 발급된 리프레시 토큰 쿠키 (HttpOnly, Secure)"
               style: simple
               schema:
                 example: refresh_token=new_token_value; Path=/; HttpOnly; Secure;
@@ -39,31 +39,31 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseAccessTokenResponse"
-        '400':
+                $ref: "#/components/schemas/RestApiResponseAccessTokenResponse"
+        "400":
           description: 리프레시 토큰이 누락되었거나 형식이 잘못된 경우
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseAccessTokenResponse"
-        '401':
+                $ref: "#/components/schemas/RestApiResponseAccessTokenResponse"
+        "401":
           description: 리프레시 토큰이 만료되었거나 변조되어 재로그인이 필요한 경우
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseAccessTokenResponse"
+                $ref: "#/components/schemas/RestApiResponseAccessTokenResponse"
       security:
       - jwtAuth: []
-  "/api/v1/auth/logout":
+  /api/v1/auth/logout:
     post:
       tags:
       - Auth
       summary: 로그아웃
-      description: 현재 사용 중인 Access Token과 Refresh Token을 무효화하고, 브라우저에 저장된 리프레시 토큰
-        쿠키를 제거합니다.
+      description: "현재 사용 중인 Access Token과 Refresh Token을 무효화하고, 브라우저에 저장된 리프레시 토큰\
+        \ 쿠키를 제거합니다."
       operationId: logout
       responses:
-        '204':
+        "204":
           description: 로그아웃 성공
           headers:
             Set-Cookie:
@@ -74,25 +74,25 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseVoid"
-        '401':
+                $ref: "#/components/schemas/RestApiResponseVoid"
+        "401":
           description: 이미 로그아웃되었거나 유효하지 않은 토큰입니다.
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseVoid"
+                $ref: "#/components/schemas/RestApiResponseVoid"
       security:
       - jwtAuth: []
-  "/api/v1/auth/logout/all":
+  /api/v1/auth/logout/all:
     post:
       tags:
       - Auth
       summary: 전역 로그아웃 (모든 기기 로그아웃)
-      description: 현재 사용 중인 계정의 모든 세션을 비활성화합니다. 호출 시 모든 기기에서 토큰이 무효화되며, 현재 브라우저의 리프레시
-        토큰 쿠키도 삭제됩니다.
+      description: "현재 사용 중인 계정의 모든 세션을 비활성화합니다. 호출 시 모든 기기에서 토큰이 무효화되며, 현재 브라우저의\
+        \ 리프레시 토큰 쿠키도 삭제됩니다."
       operationId: globalLogout
       responses:
-        '204':
+        "204":
           description: 전역 로그아웃 성공
           headers:
             Set-Cookie:
@@ -103,88 +103,88 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseVoid"
-        '401':
+                $ref: "#/components/schemas/RestApiResponseVoid"
+        "401":
           description: 인증 실패 또는 유효하지 않은 토큰
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseVoid"
+                $ref: "#/components/schemas/RestApiResponseVoid"
       security:
       - jwtAuth: []
-  "/api/v1/users/me":
+  /api/v1/users/me:
     get:
       tags:
       - User
       summary: 내 프로필 조회
-      description: 로그인된 사용자의 프로필 정보(닉네임, 이메일, 프로필 이미지 등)를 조회합니다.
+      description: "로그인된 사용자의 프로필 정보(닉네임, 이메일, 프로필 이미지 등)를 조회합니다."
       operationId: getMyProfile
       responses:
-        '200':
+        "200":
           description: 조회 성공
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseUserProfileResponse"
-        '401':
+                $ref: "#/components/schemas/RestApiResponseUserProfileResponse"
+        "401":
           description: 인증 실패 (토큰 만료 또는 누락)
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseUserProfileResponse"
-        '404':
+                $ref: "#/components/schemas/RestApiResponseUserProfileResponse"
+        "404":
           description: 사용자 정보를 찾을 수 없음
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseUserProfileResponse"
+                $ref: "#/components/schemas/RestApiResponseUserProfileResponse"
       security:
       - jwtAuth: []
     patch:
       tags:
       - User
       summary: 내 프로필 수정
-      description: 닉네임, 상태 메시지 등 내 프로필 정보를 수정합니다. 수정 후 변경된 프로필 정보를 반환합니다.
+      description: "닉네임, 상태 메시지 등 내 프로필 정보를 수정합니다. 수정 후 변경된 프로필 정보를 반환합니다."
       operationId: updateMyProfile
       requestBody:
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/UserUpdateRequest"
+              $ref: "#/components/schemas/UserUpdateRequest"
         required: true
       responses:
-        '200':
+        "200":
           description: 수정 성공
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseUserProfileResponse"
-        '400':
+                $ref: "#/components/schemas/RestApiResponseUserProfileResponse"
+        "400":
           description: 잘못된 입력 값 (유효성 검증 실패)
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseUserProfileResponse"
-        '401':
+                $ref: "#/components/schemas/RestApiResponseUserProfileResponse"
+        "401":
           description: 인증 실패
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseUserProfileResponse"
-        '404':
+                $ref: "#/components/schemas/RestApiResponseUserProfileResponse"
+        "404":
           description: 사용자를 찾을 수 없음
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseUserProfileResponse"
+                $ref: "#/components/schemas/RestApiResponseUserProfileResponse"
       security:
       - jwtAuth: []
-  "/api/v1/running-arts/{runningArtId}":
+  /api/v1/running-arts/{runningArtId}:
     get:
       tags:
       - Running Art
       summary: 런닝 아트 단건 상세 조회
-      description: 런닝 아트의 고유 ID를 사용하여 상세 정보(제목, 내용, Polyline 경로 등)를 조회합니다.
+      description: "런닝 아트의 고유 ID를 사용하여 상세 정보(제목, 내용, Polyline 경로 등)를 조회합니다."
       operationId: getById
       parameters:
       - name: runningArtId
@@ -196,24 +196,24 @@ paths:
           format: int64
         example: 1
       responses:
-        '200':
+        "200":
           description: 조회 성공
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseRunningArtResponse"
-        '401':
-          description: 인증 실패
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/RestApiResponseRunningArtResponse"
-        '404':
+                $ref: "#/components/schemas/RestApiResponseRunningArtResponse"
+        "404":
           description: 해당 ID의 런닝 아트를 찾을 수 없음
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponse"
+                $ref: "#/components/schemas/RestApiResponse"
+        "401":
+          description: 인증 실패
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestApiResponseRunningArtResponse"
       security:
       - jwtAuth: []
     delete:
@@ -232,36 +232,36 @@ paths:
           format: int64
         example: 1
       responses:
-        '204':
+        "204":
           description: 삭제 성공 (데이터 반환 없음)
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseVoid"
-        '401':
+                $ref: "#/components/schemas/RestApiResponseVoid"
+        "401":
           description: 인증 실패
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseVoid"
-        '403':
+                $ref: "#/components/schemas/RestApiResponseVoid"
+        "403":
           description: 삭제 권한 없음 (작성자 아님)
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseVoid"
-        '404':
+                $ref: "#/components/schemas/RestApiResponseVoid"
+        "404":
           description: 삭제할 런닝 아트를 찾을 수 없음
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseVoid"
-        '500':
+                $ref: "#/components/schemas/RestApiResponseVoid"
+        "500":
           description: 서버 오류
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseVoid"
+                $ref: "#/components/schemas/RestApiResponseVoid"
       security:
       - jwtAuth: []
     patch:
@@ -283,42 +283,42 @@ paths:
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/UpdateRunningArtRequest"
+              $ref: "#/components/schemas/UpdateRunningArtRequest"
         required: true
       responses:
-        '204':
+        "204":
           description: 수정 성공 (데이터 반환 없음)
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseVoid"
-        '400':
+                $ref: "#/components/schemas/RestApiResponseVoid"
+        "400":
           description: 입력 데이터 유효성 검증 실패
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseVoid"
-        '401':
+                $ref: "#/components/schemas/RestApiResponseVoid"
+        "401":
           description: 인증 실패
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseVoid"
-        '403':
+                $ref: "#/components/schemas/RestApiResponseVoid"
+        "403":
           description: 수정 권한 없음 (작성자 아님)
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseVoid"
-        '404':
+                $ref: "#/components/schemas/RestApiResponseVoid"
+        "404":
           description: 수정할 런닝 아트를 찾을 수 없음
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseVoid"
+                $ref: "#/components/schemas/RestApiResponseVoid"
       security:
       - jwtAuth: []
-  "/api/v1/running-arts/me":
+  /api/v1/running-arts/me:
     get:
       tags:
       - Running Art
@@ -326,24 +326,24 @@ paths:
       description: 현재 로그인한 사용자가 생성한 모든 런닝 아트 목록을 최신순으로 조회합니다.
       operationId: getByUserId
       responses:
-        '200':
+        "200":
           description: 조회 성공
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseListRunningArtResponse"
-        '401':
+                $ref: "#/components/schemas/RestApiResponseListRunningArtResponse"
+        "401":
           description: 인증되지 않은 사용자
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseListRunningArtResponse"
-        '500':
+                $ref: "#/components/schemas/RestApiResponseListRunningArtResponse"
+        "500":
           description: 서버 내부 오류
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseListRunningArtResponse"
+                $ref: "#/components/schemas/RestApiResponseListRunningArtResponse"
       security:
       - jwtAuth: []
     delete:
@@ -353,32 +353,33 @@ paths:
       description: 현재 로그인한 사용자가 작성한 모든 런닝 아트 데이터를 일괄 삭제합니다. 이 작업은 되돌릴 수 없으니 주의하십시오.
       operationId: deleteAllByUser
       responses:
-        '204':
+        "204":
           description: 일괄 삭제 성공 (데이터 반환 없음)
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseVoid"
-        '401':
+                $ref: "#/components/schemas/RestApiResponseVoid"
+        "401":
           description: 인증 실패
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseVoid"
-        '500':
+                $ref: "#/components/schemas/RestApiResponseVoid"
+        "500":
           description: 서버 내부 오류 (삭제 작업 실패)
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseVoid"
+                $ref: "#/components/schemas/RestApiResponseVoid"
       security:
       - jwtAuth: []
-  "/api/v1/geocode":
+  /api/v1/geocode:
     get:
       tags:
       - Geocode
       summary: 주소를 위경도로 변환 (지오코딩)
-      description: 텍스트 주소를 입력받아 해당 위치의 위도(latitude), 경도(longitude) 및 표준 주소를 반환합니다.
+      description: "텍스트 주소를 입력받아 해당 위치의 위도(latitude), 경도(longitude) 및 표준 주소를 반환합니다\
+        ."
       operationId: geocode
       parameters:
       - name: address
@@ -389,25 +390,25 @@ paths:
           type: string
         example: 서울특별시 강남구 테헤란로 427
       responses:
-        '200':
+        "200":
           description: 변환 성공
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseGeocodeResponse"
-        '400':
+                $ref: "#/components/schemas/RestApiResponseGeocodeResponse"
+        "400":
           description: 유효하지 않은 주소 형식이거나 빈 값인 경우
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseGeocodeResponse"
-        '500':
+                $ref: "#/components/schemas/RestApiResponseGeocodeResponse"
+        "500":
           description: 외부 지도 API 서버 에러 또는 위치를 찾을 수 없는 경우
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseGeocodeResponse"
-  "/api/v1/auth/login/{provider}":
+                $ref: "#/components/schemas/RestApiResponseGeocodeResponse"
+  /api/v1/auth/login/{provider}:
     get:
       tags:
       - Auth
@@ -426,21 +427,21 @@ paths:
           - GOOGLE
         example: kakao
       responses:
-        '302':
+        "302":
           description: 소셜 로그인 페이지로 리다이렉트 성공
           headers:
             Location:
               description: 이동할 소셜 로그인 URL
               style: simple
               schema: {}
-        '500':
+        "500":
           description: Internal Server Error
-  "/api/v1/auth/callback/{provider}":
+  /api/v1/auth/callback/{provider}:
     get:
       tags:
       - Auth
       summary: 소셜 로그인 콜백 (인가 코드 처리)
-      description: 소셜 서비스로부터 리다이렉트된 인가 코드(code)를 받아 로그인을 완료하고, 서비스 전용 토큰을 발급합니다.
+      description: "소셜 서비스로부터 리다이렉트된 인가 코드(code)를 받아 로그인을 완료하고, 서비스 전용 토큰을 발급합니다."
       operationId: loginCallback
       parameters:
       - name: provider
@@ -460,31 +461,31 @@ paths:
         schema:
           type: string
       responses:
-        '200':
+        "200":
           description: 로그인 성공
           headers:
             Set-Cookie:
-              description: 리프레시 토큰이 담긴 쿠키 (httpOnly, secure)
+              description: "리프레시 토큰이 담긴 쿠키 (httpOnly, secure)"
               style: simple
               schema:
                 example: refresh_token=...; Path=/; HttpOnly; Secure; SameSite=Lax
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseAccessTokenResponse"
-        '400':
+                $ref: "#/components/schemas/RestApiResponseAccessTokenResponse"
+        "400":
           description: 잘못된 인가 코드이거나 유효하지 않은 요청인 경우
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseAccessTokenResponse"
-        '500':
+                $ref: "#/components/schemas/RestApiResponseAccessTokenResponse"
+        "500":
           description: 소셜 서버와의 통신 실패 또는 내부 서버 오류
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseAccessTokenResponse"
-  "/api/v1/auth/me":
+                $ref: "#/components/schemas/RestApiResponseAccessTokenResponse"
+  /api/v1/auth/me:
     delete:
       tags:
       - Auth
@@ -492,24 +493,24 @@ paths:
       description: 현재 로그인한 사용자의 계정을 삭제하고 소셜 서비스와의 연동을 해제(Unlink)합니다.
       operationId: withdraw
       responses:
-        '204':
+        "204":
           description: 탈퇴 성공
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseVoid"
-        '401':
+                $ref: "#/components/schemas/RestApiResponseVoid"
+        "401":
           description: 인증 실패
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseVoid"
-        '500':
+                $ref: "#/components/schemas/RestApiResponseVoid"
+        "500":
           description: 서버 오류
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RestApiResponseVoid"
+                $ref: "#/components/schemas/RestApiResponseVoid"
       security:
       - jwtAuth: []
 components:
@@ -612,9 +613,9 @@ components:
           - 510 NOT_EXTENDED
           - 511 NETWORK_AUTHENTICATION_REQUIRED
         data:
-          "$ref": "#/components/schemas/AccessTokenResponse"
+          $ref: "#/components/schemas/AccessTokenResponse"
         error:
-          "$ref": "#/components/schemas/ApiError"
+          $ref: "#/components/schemas/ApiError"
     RestApiResponseVoid:
       type: object
       properties:
@@ -695,7 +696,7 @@ components:
         data:
           type: object
         error:
-          "$ref": "#/components/schemas/ApiError"
+          $ref: "#/components/schemas/ApiError"
     UserUpdateRequest:
       type: object
       description: 내 프로필 수정 요청
@@ -794,9 +795,9 @@ components:
           - 510 NOT_EXTENDED
           - 511 NETWORK_AUTHENTICATION_REQUIRED
         data:
-          "$ref": "#/components/schemas/UserProfileResponse"
+          $ref: "#/components/schemas/UserProfileResponse"
         error:
-          "$ref": "#/components/schemas/ApiError"
+          $ref: "#/components/schemas/ApiError"
     UserProfileResponse:
       type: object
       description: 내 프로필 조회 응답
@@ -812,7 +813,7 @@ components:
         statusMessage:
           type: string
           description: 상태 메시지 (한 줄 소개)
-          example: "매일 아침 7시, 한강을 달립니다. \U0001F3C3‍♂️"
+          example: "매일 아침 7시, 한강을 달립니다. 🏃‍♂️"
     UpdateRunningArtRequest:
       type: object
       description: 런닝 아트 수정 요청
@@ -908,7 +909,7 @@ components:
         data:
           type: object
         error:
-          "$ref": "#/components/schemas/ApiError"
+          $ref: "#/components/schemas/ApiError"
     RestApiResponseRunningArtResponse:
       type: object
       properties:
@@ -987,9 +988,9 @@ components:
           - 510 NOT_EXTENDED
           - 511 NETWORK_AUTHENTICATION_REQUIRED
         data:
-          "$ref": "#/components/schemas/RunningArtResponse"
+          $ref: "#/components/schemas/RunningArtResponse"
         error:
-          "$ref": "#/components/schemas/ApiError"
+          $ref: "#/components/schemas/ApiError"
     RunningArtResponse:
       type: object
       properties:
@@ -1012,7 +1013,7 @@ components:
           example: HEART
         proficiency:
           type: string
-          description: 권장 숙련도 (BEGINNER, INTERMEDIATE, ADVANCED)
+          description: "권장 숙련도 (BEGINNER, INTERMEDIATE, ADVANCED)"
           enum:
           - INTRODUCTION
           - BEGINNER
@@ -1109,9 +1110,9 @@ components:
         data:
           type: array
           items:
-            "$ref": "#/components/schemas/RunningArtResponse"
+            $ref: "#/components/schemas/RunningArtResponse"
         error:
-          "$ref": "#/components/schemas/ApiError"
+          $ref: "#/components/schemas/ApiError"
     GeocodeResponse:
       type: object
       properties:
@@ -1207,9 +1208,9 @@ components:
           - 510 NOT_EXTENDED
           - 511 NETWORK_AUTHENTICATION_REQUIRED
         data:
-          "$ref": "#/components/schemas/GeocodeResponse"
+          $ref: "#/components/schemas/GeocodeResponse"
         error:
-          "$ref": "#/components/schemas/ApiError"
+          $ref: "#/components/schemas/ApiError"
   securitySchemes:
     jwtAuth:
       type: http
